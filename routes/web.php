@@ -1,6 +1,10 @@
 <?php
+
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\LocationController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\IncidentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,9 +17,11 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    // return view('welcome');
-    return Inertia::render('Incidents/Index', [
-        'personnel' => 'David',
-    ]);
-});
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
+
+Route::get('/location', [LocationController::class, 'index'])->name('location.index');
+Route::get('/location/create', [LocationController::class, 'create'])->name('location.create');
+Route::post('/location/store', [LocationController::class, 'store'])->name('location.store');
+// Route::resource('/location', LocationController::class);
+
+Route::post('/incident/alert', [IncidentController::class, 'alert'])->name('incident.alert');
