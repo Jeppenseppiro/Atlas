@@ -10,12 +10,20 @@
 <script setup>
 import { onMounted, ref, computed, watch } from "vue";
 
-const props = defineProps({ locations: Object });
+const props = defineProps({
+  locations: Object,
+});
+
+console.log(props.locations);
 
 let map;
+var pulsingIcon = L.icon.pulse({ iconSize: [20, 20], color: "red" });
+
 let locationGroup = L.featureGroup();
+let incidentGroup = L.featureGroup();
 let overlayMaps = {
   Locations: locationGroup,
+  Incidents: incidentGroup,
 };
 
 const markers = ref([]);
@@ -48,7 +56,7 @@ onMounted(() => {
 
   // Map class initialization
   map = L.map("map", {
-    layers: [GoogleSatellite, locationGroup],
+    layers: [GoogleSatellite, locationGroup, incidentGroup],
     zoomControl: true,
     fullscreenControl: true,
     fullscreenControlOptions: {
@@ -93,16 +101,30 @@ onMounted(() => {
       }
     )
       .on("click", function (e) {
-        console.log(e.target);
+        // e.target._popup.setContent(`
+        //   <iframe name="dummyframe" id="dummyframe" style="display: none;"></iframe>
+        //   <form method="POST" action="/incident/alert" target="dummyframe">
+        //     <b>${e.target.options.title}</b><br>
+        //     <input type='hidden' name='locationId' value='${e.target.options.alt}'>
+        //     <input type='hidden' name='locationLat' value='${e.target._latlng.lat}'>
+        //     <input type='hidden' name='locationLng' value='${e.target._latlng.lng}'>
+        //     <button type='submit' name='_token' class='btn btn-xs btn-error'>Report Incident</button>
+        //   </form>
+        // `);
         e.target._popup.setContent(`
           <iframe name="dummyframe" id="dummyframe" style="display: none;"></iframe>
-          <form method="POST" action="/incident/alert" target="dummyframe">
-            <b>${e.target.options.title}</b><br>
-            <input type='hidden' name='locationId' value='${e.target.options.alt}'>
-            <input type='hidden' name='locationLat' value='${e.target._latlng.lat}'>
-            <input type='hidden' name='locationLng' value='${e.target._latlng.lng}'>
-            <button type='submit' name='_token' class='btn btn-xs btn-error'>Report Incident</button>
-          </form>
+          <label for="my-modal" class="btn">open modal</label>
+
+          <input type="checkbox" id="my-modal" class="modal-toggle" />
+          <div class="modal">
+            <div class="modal-box">
+              <h3 class="font-bold text-lg">Congratulations random Internet user!</h3>
+              <p class="py-4">You've been selected for a chance to get one year of subscription to use Wikipedia for free!</p>
+              <div class="modal-action">
+                <label for="my-modal" class="btn">Yay!</label>
+              </div>
+            </div>
+          </div>
         `);
       })
       .bindPopup(`${props.locations[location].id}`, {
@@ -111,6 +133,20 @@ onMounted(() => {
       })
       .addTo(locationGroup);
     markers.value.push(marker);
+
+    // Incident
+    for (let incident in props.locations[location].incidents) {
+      let incidentMarker = L.marker(
+        [
+          props.locations[location].latitude,
+          props.locations[location].longitude,
+        ],
+        {
+          alt: props.locations[location].incidents[incident].id,
+          icon: pulsingIcon,
+        }
+      ).addTo(incidentGroup);
+    }
   }
 
   map.addControl(
@@ -156,7 +192,7 @@ window.Echo.channel("location").listen("SendLocation", (newLocations) => {
   map.fitBounds(locationGroup.getBounds().pad(0.1));
 });
 
-// New Alert Coordinates watcher
+// New Incident Alert Coordinates watcher
 window.Echo.channel("alert").listen("SendAlert", (newAlert) => {
   //   function getLocationGroupId(code) {
   //     return markers.value.filter(function (data) {
@@ -168,13 +204,12 @@ window.Echo.channel("alert").listen("SendAlert", (newAlert) => {
   //   console.log(optionAlt[0]._leaflet_id);
   //   locationGroup.removeLayer(optionAlt[0]._leaflet_id);
 
-  var pulsingIcon = L.icon.pulse({ iconSize: [20, 20], color: "red" });
   var marker = L.marker(
     [newAlert.alert[0].locationLat, newAlert.alert[0].locationLng],
     { icon: pulsingIcon }
-  ).addTo(map);
+  ).addTo(incidentGroup);
 
-  console.log(newAlert.alert[0].locationId);
+  console.log(newAlert);
 });
 </script>
 

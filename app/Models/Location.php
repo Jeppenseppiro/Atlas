@@ -11,4 +11,9 @@ class Location extends Model
     use HasFactory, UUID;
 
     protected $fillable = ['address', 'latitude', 'longitude'];
+
+    public function incidents()
+    {
+        return $this->hasMany(Incident::class);
+    }
 }

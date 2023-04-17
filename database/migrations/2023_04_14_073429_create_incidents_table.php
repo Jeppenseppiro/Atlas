@@ -13,9 +13,10 @@ return new class extends Migration
     {
         Schema::create('incidents', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->text('location_id');
-            $table->text('description');
-            $table->boolean('is_active');
+            $table->char('location_id', 36);
+            $table->text('description')->nullable();
+            $table->boolean('is_active')->default(1);
+            $table->foreign('location_id')->references('id')->on('locations');
             $table->timestamps();
         });
     }

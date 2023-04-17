@@ -11,7 +11,6 @@ export default {
   layout: Nav,
   props: {
     locations: Object,
-    name: String,
   },
   components: {
     Map,
