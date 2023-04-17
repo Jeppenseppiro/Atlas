@@ -21,14 +21,11 @@
             </svg>
           </label>
         </div>
-        <div class="flex-1 px-2 mx-2 normal-case text-xl">Tempestas</div>
+        <div class="flex-1 px-2 mx-2 normal-case text-xl">Atlas</div>
         <label
           class="flex-none btn mr-2 text-center"
           for="search-modal"
-          v-if="
-            $page.component == 'Weather/Index' &&
-            Object.keys(weatherForecast.newWeatherCurrentForecast).length > 0
-          "
+          v-if="$page.component == 'Incidents/Index'"
           >Search Location</label
         >
         <div class="flex-1"></div>
@@ -58,14 +55,18 @@
         </div>
       </div>
 
-      <slot />
+      <div class="container mx-auto bg-base-800">
+        <!-- <Toast /> -->
+
+        <slot />
+      </div>
     </div>
     <div class="drawer-side">
       <label for="my-drawer" class="drawer-overlay"></label>
       <ul class="menu p-4 w-80 bg-base-100 text-base-content">
         <!-- Sidebar content here -->
-        <li><a>Sidebar Item 1</a></li>
-        <li><a>Sidebar Item 2</a></li>
+        <li><Link :href="route('dashboard.index')">Dashboard</Link></li>
+        <li><Link :href="route('location.index')">Locations</Link></li>
       </ul>
     </div>
   </div>
@@ -73,8 +74,17 @@
 
 <script>
 import { Link } from "@inertiajs/vue3";
+import Toast from "../Components/Toast.vue";
 
 export default {
-  setup() {},
+  components: {
+    Link,
+    Toast,
+  },
+  setup() {
+    function toastNotif() {}
+
+    return { toastNotif };
+  },
 };
 </script>
