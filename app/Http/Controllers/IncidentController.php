@@ -17,7 +17,7 @@ class IncidentController extends Controller
 
         Incident::create([
             'location_id' => $location[0]['id'],
-            // 'description' => 'need help',
+            'description' => $locationDetails['description'],
         ]);
 
         $alert = array();
@@ -28,4 +28,22 @@ class IncidentController extends Controller
         ]);
         event(new SendAlert($alert));
     }
+
+    // public function alert(Request $request)
+    // {
+    //     $location = Location::where('id', 'LIKE', '%' . $request->incidents['locationId'] . '%')->get();
+
+    //     Incident::create([
+    //         'location_id' => $request->incidents['locationId'],
+    //         'description' => $request->incidents['description'],
+    //     ]);
+
+    //     $alert = array();
+    //     array_push($alert, [
+    //         'locationId' => $location[0]->id,
+    //         'locationLat' => $location[0]->latitude,
+    //         'locationLng' => $location[0]->longitude
+    //     ]);
+    //     event(new SendAlert($alert));
+    // }
 }
